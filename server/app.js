@@ -6,15 +6,21 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const app = express();
-const allowedOrigins = (process.env.CLIENT_URL || "http://localhost:5173")
+const allowedOrigins = (
+  process.env.CLIENT_URL || "http://localhost:5173,http://127.0.0.1:5173"
+)
   .split(",")
   .map((origin) => origin.trim())
   .filter(Boolean);
+const vercelOriginPattern = /^https:\/\/[a-z0-9-]+\.vercel\.app$/i;
 
 app.use((request, response, next) => {
   const origin = request.headers.origin;
   const isAllowed =
-    !origin || allowedOrigins.includes("*") || allowedOrigins.includes(origin);
+    !origin ||
+    allowedOrigins.includes("*") ||
+    allowedOrigins.includes(origin) ||
+    vercelOriginPattern.test(origin);
 
   if (isAllowed) {
     response.setHeader(
