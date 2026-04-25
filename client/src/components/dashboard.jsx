@@ -16,7 +16,140 @@ const emptyTaskForm = {
   dueDate: "",
 };
 
-const filters = ["all", "active", "done", "overdue"];
+const filters = [
+  { key: "all", label: "All", icon: "layers" },
+  { key: "active", label: "Active", icon: "circle" },
+  { key: "done", label: "Done", icon: "check" },
+  { key: "overdue", label: "Overdue", icon: "alert" },
+];
+
+const Icon = ({ name, className = "" }) => {
+  const paths = {
+    alert: (
+      <>
+        <path d="M12 9v4" />
+        <path d="M12 17h.01" />
+        <path d="M10.3 3.9 2.5 17.3A2 2 0 0 0 4.2 20h15.6a2 2 0 0 0 1.7-2.7L13.7 3.9a2 2 0 0 0-3.4 0Z" />
+      </>
+    ),
+    calendar: (
+      <>
+        <path d="M8 2v4" />
+        <path d="M16 2v4" />
+        <path d="M3.5 9.5h17" />
+        <path d="M5 4h14a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z" />
+      </>
+    ),
+    check: (
+      <>
+        <path d="m5 12 4 4L19 6" />
+      </>
+    ),
+    circle: (
+      <>
+        <circle cx="12" cy="12" r="8" />
+      </>
+    ),
+    edit: (
+      <>
+        <path d="M12 20h9" />
+        <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" />
+      </>
+    ),
+    layers: (
+      <>
+        <path d="m12 3 9 5-9 5-9-5 9-5Z" />
+        <path d="m3 13 9 5 9-5" />
+        <path d="m3 18 9 5 9-5" />
+      </>
+    ),
+    lock: (
+      <>
+        <path d="M7 11V8a5 5 0 0 1 10 0v3" />
+        <path d="M6 11h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1Z" />
+      </>
+    ),
+    logOut: (
+      <>
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+        <path d="m16 17 5-5-5-5" />
+        <path d="M21 12H9" />
+      </>
+    ),
+    mail: (
+      <>
+        <path d="M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z" />
+        <path d="m4 7 8 6 8-6" />
+      </>
+    ),
+    plus: (
+      <>
+        <path d="M12 5v14" />
+        <path d="M5 12h14" />
+      </>
+    ),
+    search: (
+      <>
+        <circle cx="11" cy="11" r="7" />
+        <path d="m20 20-3.7-3.7" />
+      </>
+    ),
+    shield: (
+      <>
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
+        <path d="m9.5 12 1.8 1.8L15 9.8" />
+      </>
+    ),
+    sparkle: (
+      <>
+        <path d="M12 2 9.8 8.4 4 11l5.8 2.6L12 20l2.2-6.4L20 11l-5.8-2.6L12 2Z" />
+      </>
+    ),
+    trash: (
+      <>
+        <path d="M4 7h16" />
+        <path d="M10 11v6" />
+        <path d="M14 11v6" />
+        <path d="M6 7l1 14h10l1-14" />
+        <path d="M9 7V4h6v3" />
+      </>
+    ),
+    user: (
+      <>
+        <path d="M20 21a8 8 0 0 0-16 0" />
+        <circle cx="12" cy="7" r="4" />
+      </>
+    ),
+  };
+
+  return (
+    <svg
+      aria-hidden="true"
+      className={`icon ${className}`}
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      {paths[name]}
+    </svg>
+  );
+};
+
+const TaskManLogo = ({ compact = false }) => (
+  <div className={compact ? "app-logo compact-logo" : "app-logo"}>
+    <svg aria-hidden="true" className="logo-symbol" viewBox="0 0 64 64">
+      <rect className="logo-bg" height="52" rx="18" width="52" x="6" y="6" />
+      <path className="logo-fold" d="M42 6h-8c12 6 18 15 18 28v-10A18 18 0 0 0 42 6Z" />
+      <path className="logo-check" d="m21 33 8 8 16-19" />
+      <path className="logo-line" d="M19 20h18" />
+    </svg>
+    {!compact && (
+      <span>
+        <strong>Task</strong>
+        <em>Man</em>
+      </span>
+    )}
+  </div>
+);
 
 const readStoredUser = () => {
   try {
@@ -204,6 +337,13 @@ function Dashboard() {
 
     return true;
   });
+
+  const stats = [
+    { label: "Total", value: totalTasks, icon: "layers" },
+    { label: "Active", value: activeTasks, icon: "circle" },
+    { label: "Done", value: completedTasks, icon: "check" },
+    { label: "Overdue", value: overdueTasks, icon: "alert", attention: overdueTasks },
+  ];
 
   const clearFeedback = () => {
     setError("");
@@ -444,17 +584,31 @@ function Dashboard() {
   if (!isSignedIn) {
     return (
       <main className="auth-shell">
-        <section className="auth-hero" aria-label="Task manager introduction">
-          <div className="brand-mark">tm</div>
-          <p className="eyebrow">Private task command center</p>
-          <h1>Catch every loose thread before it becomes a knot.</h1>
+        <section className="auth-hero" aria-label="Task Man introduction">
+          <div className="hero-topline">
+            <TaskManLogo />
+            <span className="hero-badge">
+              <Icon name="shield" />
+              Private workspace
+            </span>
+          </div>
+          <p className="eyebrow">Task Man keeps the day calm</p>
+          <h1>Plan the work. Finish with less noise.</h1>
           <p className="hero-copy">
-            Sign in to manage your own tasks, due dates, progress, and the small
-            daily wins that keep projects moving.
+            A focused task board for personal planning, deadlines, and the small
+            decisions that move real projects forward.
           </p>
-          <div className="hero-card">
-            <span>Backend ready</span>
-            <strong>JWT auth + scoped tasks</strong>
+          <div className="hero-card-grid" aria-label="Product highlights">
+            <article className="hero-card">
+              <Icon name="shield" />
+              <span>Secure auth</span>
+              <strong>JWT protected tasks</strong>
+            </article>
+            <article className="hero-card">
+              <Icon name="calendar" />
+              <span>Due dates</span>
+              <strong>Spot urgency fast</strong>
+            </article>
           </div>
         </section>
 
@@ -468,6 +622,7 @@ function Dashboard() {
                 setAuthMode("signin");
               }}
             >
+              <Icon name="lock" />
               Sign in
             </button>
             <button
@@ -478,6 +633,7 @@ function Dashboard() {
                 setAuthMode("signup");
               }}
             >
+              <Icon name="user" />
               Sign up
             </button>
           </div>
@@ -489,14 +645,17 @@ function Dashboard() {
               </p>
               <h2>
                 {authMode === "signup"
-                  ? "Start your workspace"
-                  : "Enter your workspace"}
+                  ? "Start with Task Man"
+                  : "Open your board"}
               </h2>
             </div>
 
             {authMode === "signup" && (
               <label>
-                Name
+                <span>
+                  <Icon name="user" />
+                  Name
+                </span>
                 <input
                   autoComplete="name"
                   onChange={(event) => updateAuthField("name", event.target.value)}
@@ -509,7 +668,10 @@ function Dashboard() {
             )}
 
             <label>
-              Email
+              <span>
+                <Icon name="mail" />
+                Email
+              </span>
               <input
                 autoComplete="email"
                 onChange={(event) => updateAuthField("email", event.target.value)}
@@ -521,7 +683,10 @@ function Dashboard() {
             </label>
 
             <label>
-              Password
+              <span>
+                <Icon name="lock" />
+                Password
+              </span>
               <input
                 autoComplete={
                   authMode === "signup" ? "new-password" : "current-password"
@@ -541,6 +706,7 @@ function Dashboard() {
             {message && <p className="feedback success">{message}</p>}
 
             <button className="primary-action" disabled={isAuthLoading} type="submit">
+              <Icon name="sparkle" />
               {isAuthLoading
                 ? "Working..."
                 : authMode === "signup"
@@ -555,46 +721,59 @@ function Dashboard() {
 
   return (
     <main className="dashboard-shell">
-      <section className="dashboard-hero">
-        <div>
-          <p className="eyebrow">Task manager</p>
-          <h1>Today has a plan.</h1>
-          <p className="hero-copy">
-            {user?.name ? `Welcome, ${user.name}. ` : ""}
-            Build the list, clear the noise, and keep the useful things visible.
-          </p>
-        </div>
+      <header className="topbar">
+        <TaskManLogo />
         <button className="ghost-action" onClick={handleLogout} type="button">
+          <Icon name="logOut" />
           Sign out
         </button>
+      </header>
+
+      <section className="dashboard-hero">
+        <div>
+          <p className="eyebrow">Good to see you{user?.name ? `, ${user.name}` : ""}</p>
+          <h1>Make today feel handled.</h1>
+          <p className="hero-copy">
+            Capture the work, track deadlines, and move finished tasks out of
+            your mental background noise.
+          </p>
+        </div>
+        <div className="hero-mini-card">
+          <Icon name="sparkle" />
+          <span>Focus mode</span>
+          <strong>{activeTasks} open tasks</strong>
+        </div>
       </section>
 
       <section className="stats-grid" aria-label="Task summary">
-        <article>
-          <span>Total</span>
-          <strong>{totalTasks}</strong>
-        </article>
-        <article>
-          <span>Active</span>
-          <strong>{activeTasks}</strong>
-        </article>
-        <article>
-          <span>Done</span>
-          <strong>{completedTasks}</strong>
-        </article>
-        <article className={overdueTasks ? "attention" : ""}>
-          <span>Overdue</span>
-          <strong>{overdueTasks}</strong>
-        </article>
+        {stats.map((stat) => (
+          <article className={stat.attention ? "attention" : ""} key={stat.label}>
+            <span className="stat-icon">
+              <Icon name={stat.icon} />
+            </span>
+            <span>{stat.label}</span>
+            <strong>{stat.value}</strong>
+          </article>
+        ))}
       </section>
 
       <section className="workspace-grid">
         <aside className="task-composer" aria-label="Add a task">
-          <p className="form-kicker">New task</p>
-          <h2>Put it on the board</h2>
+          <div className="panel-title">
+            <span className="panel-icon">
+              <Icon name="plus" />
+            </span>
+            <div>
+              <p className="form-kicker">New task</p>
+              <h2>Add to the board</h2>
+            </div>
+          </div>
           <form onSubmit={handleCreateTask}>
             <label>
-              Title
+              <span>
+                <Icon name="layers" />
+                Title
+              </span>
               <input
                 onChange={(event) => updateTaskField("title", event.target.value)}
                 placeholder="Ship landing page"
@@ -605,7 +784,10 @@ function Dashboard() {
             </label>
 
             <label>
-              Description
+              <span>
+                <Icon name="edit" />
+                Description
+              </span>
               <textarea
                 onChange={(event) =>
                   updateTaskField("description", event.target.value)
@@ -617,7 +799,10 @@ function Dashboard() {
             </label>
 
             <label>
-              Due date
+              <span>
+                <Icon name="calendar" />
+                Due date
+              </span>
               <input
                 min={dateTimeMin}
                 onChange={(event) => updateTaskField("dueDate", event.target.value)}
@@ -630,6 +815,7 @@ function Dashboard() {
             {message && <p className="feedback success">{message}</p>}
 
             <button className="primary-action" disabled={isSavingTask} type="submit">
+              <Icon name="plus" />
               {isSavingTask ? "Saving..." : "Add task"}
             </button>
           </form>
@@ -637,29 +823,39 @@ function Dashboard() {
 
         <section className="task-board" aria-label="Task list">
           <div className="board-toolbar">
-            <div>
-              <p className="form-kicker">Your queue</p>
-              <h2>{isTaskLoading ? "Loading tasks..." : `${visibleTasks.length} shown`}</h2>
+            <div className="panel-title">
+              <span className="panel-icon">
+                <Icon name="layers" />
+              </span>
+              <div>
+                <p className="form-kicker">Your queue</p>
+                <h2>
+                  {isTaskLoading ? "Loading tasks..." : `${visibleTasks.length} shown`}
+                </h2>
+              </div>
             </div>
-            <input
-              aria-label="Search tasks"
-              className="search-input"
-              onChange={(event) => changeSearch(event.target.value)}
-              placeholder="Search tasks"
-              type="search"
-              value={search}
-            />
+            <label className="search-field">
+              <Icon name="search" />
+              <input
+                aria-label="Search tasks"
+                onChange={(event) => changeSearch(event.target.value)}
+                placeholder="Search tasks"
+                type="search"
+                value={search}
+              />
+            </label>
           </div>
 
           <div className="filter-row" aria-label="Filter tasks">
-            {filters.map((filterName) => (
+            {filters.map((filterItem) => (
               <button
-                className={filter === filterName ? "active" : ""}
-                key={filterName}
-                onClick={() => changeFilter(filterName)}
+                className={filter === filterItem.key ? "active" : ""}
+                key={filterItem.key}
+                onClick={() => changeFilter(filterItem.key)}
                 type="button"
               >
-                {filterName}
+                <Icon name={filterItem.icon} />
+                {filterItem.label}
               </button>
             ))}
           </div>
@@ -667,6 +863,7 @@ function Dashboard() {
           <div className="task-list">
             {!isTaskLoading && visibleTasks.length === 0 && (
               <div className="empty-state">
+                <TaskManLogo compact />
                 <strong>No tasks here.</strong>
                 <span>
                   {tasks.length
@@ -694,7 +891,10 @@ function Dashboard() {
                       onSubmit={(event) => handleUpdateTask(event, task)}
                     >
                       <label>
-                        Title
+                        <span>
+                          <Icon name="layers" />
+                          Title
+                        </span>
                         <input
                           onChange={(event) =>
                             updateEditField("title", event.target.value)
@@ -705,7 +905,10 @@ function Dashboard() {
                         />
                       </label>
                       <label>
-                        Description
+                        <span>
+                          <Icon name="edit" />
+                          Description
+                        </span>
                         <textarea
                           onChange={(event) =>
                             updateEditField("description", event.target.value)
@@ -715,7 +918,10 @@ function Dashboard() {
                         />
                       </label>
                       <label>
-                        Due date
+                        <span>
+                          <Icon name="calendar" />
+                          Due date
+                        </span>
                         <input
                           min={dateTimeMin}
                           onChange={(event) =>
@@ -731,6 +937,7 @@ function Dashboard() {
                           disabled={isSavingTask}
                           type="submit"
                         >
+                          <Icon name="check" />
                           Save
                         </button>
                         <button
@@ -755,12 +962,13 @@ function Dashboard() {
                           onClick={() => handleToggleTask(task)}
                           type="button"
                         >
-                          {task.completed ? "Ok" : ""}
+                          {task.completed && <Icon name="check" />}
                         </button>
                         <div>
                           <h3>{task.title}</h3>
                           {task.description && <p>{task.description}</p>}
                           <span className={isOverdue ? "due-date overdue" : "due-date"}>
+                            <Icon name={isOverdue ? "alert" : "calendar"} />
                             {formatDate(task.dueDate)}
                           </span>
                         </div>
@@ -771,6 +979,7 @@ function Dashboard() {
                           onClick={() => startEditingTask(task)}
                           type="button"
                         >
+                          <Icon name="edit" />
                           Edit
                         </button>
                         <button
@@ -778,6 +987,7 @@ function Dashboard() {
                           onClick={() => handleDeleteTask(task)}
                           type="button"
                         >
+                          <Icon name="trash" />
                           Delete
                         </button>
                       </div>
