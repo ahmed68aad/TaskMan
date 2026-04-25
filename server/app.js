@@ -1,18 +1,25 @@
 const express = require("express");
 const userRouter = require("./rootes/user.js");
 const tasksRouter = require("./rootes/tasks.js");
+const connectDB = require("./config/db.js");
 const dotenv = require("dotenv");
 
 dotenv.config();
 
 const app = express();
-const allowedOrigins = (
-  process.env.CLIENT_URL || "http://localhost:5173,http://127.0.0.1:5173"
-)
+const defaultAllowedOrigins = [
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+];
+const configuredAllowedOrigins = (process.env.CLIENT_URL || "")
   .split(",")
   .map((origin) => origin.trim())
   .filter(Boolean);
+const allowedOrigins = [
+  ...new Set([...defaultAllowedOrigins, ...configuredAllowedOrigins]),
+];
 const vercelOriginPattern = /^https:\/\/[a-z0-9-]+\.vercel\.app$/i;
+const localhostOriginPattern = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i;
 
 app.use((request, response, next) => {
   const origin = request.headers.origin;
@@ -20,6 +27,7 @@ app.use((request, response, next) => {
     !origin ||
     allowedOrigins.includes("*") ||
     allowedOrigins.includes(origin) ||
+    localhostOriginPattern.test(origin) ||
     vercelOriginPattern.test(origin);
 
   if (isAllowed) {
@@ -38,6 +46,7 @@ app.use((request, response, next) => {
     "Access-Control-Allow-Headers",
     "Content-Type, Authorization, token",
   );
+  response.setHeader("Access-Control-Max-Age", "86400");
 
   if (request.method === "OPTIONS") {
     return response.sendStatus(204);
@@ -52,7 +61,21 @@ app.get("/", (request, response) => {
     message: "Task manager API is running",
   });
 });
-app.use("/users", userRouter);
-app.use("/tasks", tasksRouter);
+
+const ensureDatabase = async (request, response, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    console.error("Database connection error:", error.message);
+    response.status(500).json({
+      success: false,
+      message: "Database connection failed",
+    });
+  }
+};
+
+app.use("/users", ensureDatabase, userRouter);
+app.use("/tasks", ensureDatabase, tasksRouter);
 
 module.exports = app;

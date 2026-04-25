@@ -47,16 +47,16 @@ npm install
 npm run dev
 ```
 
-The frontend defaults to the deployed API at `https://task-man-gray.vercel.app`. Set `VITE_API_URL` in `client/.env.local` if you want to use a local backend.
+The frontend defaults to `/api`. In local development, Vite proxies `/api` to `https://task-man-gray.vercel.app`; in Vercel, rewrites do the same thing. Set `VITE_API_URL` in `client/.env.local` only if you want to bypass the proxy and call a different backend directly.
 
 ## Deploy Frontend
 
-This repo includes `vercel.json` for deploying the React client from the repo root. Vercel will install dependencies in `client`, run the Vite build, and serve `client/dist`.
+This repo includes `vercel.json` for deploying the React client from the repo root. Vercel will install dependencies in `client`, run the Vite build, serve `client/dist`, and proxy `/api/*` to `https://task-man-gray.vercel.app`.
 
 If you deploy from the `client` directory instead, use the included `client/vercel.json` and set:
 
 ```env
-VITE_API_URL=https://task-man-gray.vercel.app
+VITE_API_URL=/api
 ```
 
 For stricter backend CORS, set the backend `CLIENT_URL` environment variable to your deployed frontend URL.

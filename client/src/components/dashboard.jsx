@@ -1,7 +1,7 @@
 import { startTransition, useDeferredValue, useEffect, useState } from "react";
 
 const API_URL =
-  import.meta.env.VITE_API_URL || "https://task-man-gray.vercel.app";
+  import.meta.env.VITE_API_URL || "/api";
 const TOKEN_KEY = "task_manager_token";
 const USER_KEY = "task_manager_user";
 
